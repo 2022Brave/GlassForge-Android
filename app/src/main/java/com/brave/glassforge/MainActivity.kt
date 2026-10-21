@@ -27,7 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.ImageVector\nimport androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity() {
 
     private fun pinWidget(providerClass: Class<out AppWidgetProvider>, opacity: Float, accent: Int) {
         // Save the appearance before Android creates the pinned widget so its first render uses the chosen style.
-        getSharedPreferences("glassforge", MODE_PRIVATE).edit().putFloat("opacity", opacity).putInt("accent", accent).apply()
+        getSharedPreferences("glassforge", MODE_PRIVATE).edit().putFloat("opacity", opacity).putInt("accent", accent).apply()\n        GlassThemeManager.save(this, accentColor = Accents[accent.coerceIn(0, Accents.lastIndex)].toArgb(), glassAlpha = opacity, refresh = false)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && AppWidgetManager.getInstance(this).isRequestPinAppWidgetSupported) {
             val ok = AppWidgetManager.getInstance(this).requestPinAppWidget(ComponentName(this, providerClass), Bundle(), null)
             if (!ok) Toast.makeText(this, "Open your home screen → Widgets → GlassForge to add it.", Toast.LENGTH_LONG).show()
