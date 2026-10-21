@@ -209,7 +209,7 @@ private fun FeaturedPreview(accent: Color) {
 
 @Composable
 private fun WidgetTile(design: WidgetDesign, modifier: Modifier, onOpen: () -> Unit, onAdd: () -> Unit) {
-    Column(modifier.clip(RoundedCornerShape(22.dp)).background(Panel).border(1.dp, Color.White.copy(alpha = .08f), RoundedCornerShape(22.dp)).clickable(onClick = onOpen).padding(10.dp)) {
+    Column(modifier.clip(RoundedCornerShape(22.dp)).background(Panel).border(1.dp, Color.White.copy(alpha = .08f), RoundedCornerShape(22.dp)).clickable(onClick = onAdd).padding(10.dp)) {
         Box(Modifier.fillMaxWidth().height(128.dp).clip(RoundedCornerShape(16.dp)).background(Brush.linearGradient(listOf(Color(0xFF292930), Color(0xFF17171D), Color(0xFF0D0D11)))).border(1.dp, Brush.linearGradient(listOf(Color.White.copy(alpha = .30f), design.accent.copy(alpha = .22f), Color.White.copy(alpha = .04f))), RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
             Column(Modifier.align(Alignment.TopStart).padding(start = 7.dp, top = 6.dp), verticalArrangement = Arrangement.spacedBy((-2).dp)) {
                 listOf(1f, .45f, .20f, .08f).forEach { echoAlpha -> Text(design.category.uppercase(), color = Color.White.copy(alpha = echoAlpha), fontSize = 6.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1) }
