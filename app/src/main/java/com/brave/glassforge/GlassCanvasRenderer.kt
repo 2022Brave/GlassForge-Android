@@ -26,7 +26,7 @@ import kotlin.math.min
  * Render at a 2x logical scale; ImageView scales the result to the launcher's cell.
  */
 object GlassCanvasRenderer {
-    enum class Kind { BATTERY, CLOCK, NEON_CLOCK, STACKED_CLOCK, CALENDAR, QUOTE, SEARCH_PILL, WEATHER, COMPASS, MUSIC, SCREEN_TIME }
+    enum class Kind { BATTERY, CLOCK, ANALOG_CLOCK, NEON_CLOCK, STACKED_CLOCK, CALENDAR, QUOTE, SEARCH_PILL, WEATHER, COMPASS, MUSIC, SCREEN_TIME }
 
     fun render(context: Context, kind: Kind, width: Int = 640, height: Int = 400, progress: Int = -1): Bitmap {
         val theme = GlassThemeManager.read(context)
@@ -43,6 +43,7 @@ object GlassCanvasRenderer {
         when (kind) {
             Kind.BATTERY -> drawBattery(context, canvas, accent, progress)
             Kind.CLOCK -> drawClock(canvas, accent, false)
+            Kind.ANALOG_CLOCK -> drawAnalogClock(canvas, accent)
             Kind.NEON_CLOCK -> drawNeonClock(canvas, accent)
             Kind.STACKED_CLOCK -> drawStackedClock(canvas, accent)
             Kind.CALENDAR -> drawCalendar(canvas, accent)
@@ -135,6 +136,42 @@ object GlassCanvasRenderer {
         val time = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date())
         text(c, time, 320f, 230f, 112f, Color.WHITE, true, Paint.Align.CENTER)
         text(c, SimpleDateFormat("EEE · dd MMM", Locale.getDefault()).format(Date()).uppercase(Locale.getDefault()), 320f, 286f, 20f, accent, true, Paint.Align.CENTER)
+    }
+
+    private fun drawAnalogClock(c: Canvas, accent: Int) {
+        val cx = 320f
+        val cy = 198f
+        val radius = 128f
+        val p = Paint(Paint.ANTI_ALIAS_FLAG).apply {
+            style = Paint.Style.STROKE
+            strokeWidth = 3f
+            color = Color.argb(135, 255, 255, 255)
+        }
+        c.drawCircle(cx, cy, radius, p)
+        c.drawCircle(cx, cy, radius - 13f, p)
+        for (i in 0 until 60) {
+            val a = Math.toRadians((i * 6 - 90).toDouble())
+            val outer = radius - 20f
+            val inner = if (i % 5 == 0) radius - 38f else radius - 27f
+            p.strokeWidth = if (i % 5 == 0) 3f else 1.5f
+            c.drawLine(cx + kotlin.math.cos(a).toFloat() * inner, cy + kotlin.math.sin(a).toFloat() * inner,
+                cx + kotlin.math.cos(a).toFloat() * outer, cy + kotlin.math.sin(a).toFloat() * outer, p)
+        }
+        val now = java.util.Calendar.getInstance()
+        val hour = now.get(java.util.Calendar.HOUR).toFloat() + now.get(java.util.Calendar.MINUTE) / 60f
+        val minute = now.get(java.util.Calendar.MINUTE).toFloat()
+        val second = now.get(java.util.Calendar.SECOND).toFloat()
+        fun hand(value: Float, perCircle: Float, length: Float, width: Float, color: Int) {
+            val a = Math.toRadians(value / perCircle * 360.0 - 90.0)
+            p.style = Paint.Style.STROKE; p.strokeWidth = width; p.strokeCap = Paint.Cap.ROUND; p.color = color
+            c.drawLine(cx, cy, cx + kotlin.math.cos(a).toFloat() * length, cy + kotlin.math.sin(a).toFloat() * length, p)
+        }
+        hand(hour, 12f, 66f, 8f, Color.WHITE)
+        hand(minute, 60f, 94f, 5f, accent)
+        hand(second, 60f, 104f, 2f, Color.argb(170, 255, 255, 255))
+        p.style = Paint.Style.FILL; p.color = accent
+        c.drawCircle(cx, cy, 8f, p)
+        text(c, "ANALOG ATELIER", cx, 366f, 17f, Color.argb(170, 255, 255, 255), true, Paint.Align.CENTER)
     }
 
     private fun drawNeonClock(c: Canvas, accent: Int) {
