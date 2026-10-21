@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+    <ImageView android:id="@+id/widget_canvas" android:layout_width="match_parent" android:layout_height="match_parent" android:contentDescription="Dark glass clock surface" android:scaleType="fitXY" />
+    <LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:gravity="center" android:orientation="vertical" android:padding="8dp">
+        <TextClock android:id="@+id/clock_live_time" android:layout_width="wrap_content" android:layout_height="wrap_content" android:format12Hour="hh:mm" android:format24Hour="HH:mm" android:textColor="#FFFFFFFF" android:textSize="42sp" android:fontFamily="sans-serif-condensed" android:includeFontPadding="false" android:letterSpacing="-0.04" />
+        <TextClock android:id="@+id/clock_live_date" android:layout_width="wrap_content" android:layout_height="wrap_content" android:format12Hour="EEE · dd MMM" android:format24Hour="EEE · dd MMM" android:textColor="#FF8B3DFF" android:textSize="10sp" android:fontFamily="sans-serif-medium" android:letterSpacing="0.12" />
+    </LinearLayout>
+</FrameLayout>
