@@ -40,7 +40,7 @@ object GlassThemeManager {
 
     fun read(context: Context): Theme {
         val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val accent = p.getInt("accentColor", p.getInt("accentArgb", DEFAULT_ACCENT))
+        val legacy = intArrayOf(0xFF9C5CFF.toInt(), 0xFF38A8FF.toInt(), 0xFF17D7B0.toInt(), 0xFFFFB44A.toInt(), 0xFFFF5E8A.toInt(), 0xFFF0F0F4.toInt())\n        val accent = when {\n            p.contains("accentColor") -> p.getInt("accentColor", DEFAULT_ACCENT)\n            p.contains("accentArgb") -> p.getInt("accentArgb", DEFAULT_ACCENT)\n            else -> legacy[p.getInt("accent", 0).coerceIn(0, legacy.lastIndex)]\n        }
         val hsv = FloatArray(3)
         colorToHSV(accent, hsv)
         return Theme(
