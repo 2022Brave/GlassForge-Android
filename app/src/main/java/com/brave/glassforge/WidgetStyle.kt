@@ -5,7 +5,7 @@ import android.graphics.Color
 import android.widget.RemoteViews
 
 object WidgetStyle {
-    private val accents = intArrayOf(0xFF8AB4FF.toInt(), 0xFF9AE6D1.toInt(), 0xFFC5A7FF.toInt(), 0xFFFFC6A5.toInt())
+    private val accents = intArrayOf(0xFF9C5CFF.toInt(), 0xFF38A8FF.toInt(), 0xFF17D7B0.toInt(), 0xFFFFB44A.toInt(), 0xFFFF5E8A.toInt(), 0xFFF0F0F4.toInt())
 
     fun apply(context: Context, views: RemoteViews, rootId: Int, accentId: Int = R.id.widget_accent) {
         val prefs = context.getSharedPreferences("glassforge", Context.MODE_PRIVATE)
