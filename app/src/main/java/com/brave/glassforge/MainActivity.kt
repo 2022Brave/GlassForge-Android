@@ -41,8 +41,8 @@ private val Accents = listOf(Color(0xFF9C5CFF), Color(0xFF38A8FF), Color(0xFF17D
 private data class WidgetDesign(val name: String, val category: String, val description: String, val icon: ImageVector, val provider: Int, val style: Int, val accent: Color)
 private val designs = listOf(
     WidgetDesign("Orbit Digital", "Clock", "Live digital time · date", Icons.Default.Schedule, 0, 0, Color(0xFF9C5CFF)),
-    WidgetDesign("Mono Clock", "Clock", "Minimal digital face", Icons.Default.AccessTime, 0, 1, Color(0xFFF0F0F4)),
-    WidgetDesign("Violet Time", "Clock", "Oversized digital clock", Icons.Default.Timer, 0, 2, Color(0xFF9C5CFF)),
+    WidgetDesign("Mono Clock", "Clock", "Minimal digital face", Icons.Default.AccessTime, 8, 1, Color(0xFFF0F0F4)),
+    WidgetDesign("Violet Time", "Clock", "Oversized digital clock", Icons.Default.Timer, 9, 2, Color(0xFF9C5CFF)),
     WidgetDesign("Analog Atelier", "Clock", "Live analog clock face", Icons.Default.AccessTime, 4, 0, Color(0xFF9C5CFF)),
     WidgetDesign("Glow Battery", "Device", "Battery · charging state", Icons.Default.BatteryFull, 1, 0, Color(0xFF38A8FF)),
     WidgetDesign("Pulse Battery", "Device", "Compact battery glance", Icons.Default.BatteryChargingFull, 1, 1, Color(0xFF17D7B0)),
@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity() {
 
     private fun refreshAllWidgets() {
         val manager = AppWidgetManager.getInstance(this)
-        listOf(GlassClockWidget::class.java, GlassBatteryWidget::class.java, GlassCalendarWidget::class.java, GlassQuoteWidget::class.java, GlassAnalogClockWidget::class.java, GlassScreenTimeWidget::class.java, GlassMusicWidget::class.java, GlassMusicMiniWidget::class.java).forEach { klass ->
+        listOf(GlassClockWidget::class.java, GlassMonoClockWidget::class.java, GlassNeonClockWidget::class.java, GlassBatteryWidget::class.java, GlassCalendarWidget::class.java, GlassQuoteWidget::class.java, GlassAnalogClockWidget::class.java, GlassScreenTimeWidget::class.java, GlassMusicWidget::class.java, GlassMusicMiniWidget::class.java).forEach { klass ->
             val component = ComponentName(this, klass)
             val ids = manager.getAppWidgetIds(component)
             if (ids.isNotEmpty()) sendBroadcast(Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).setComponent(component).putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids))
@@ -113,7 +113,9 @@ private fun GlassForgeApp(initialOpacity: Float, initialAccent: Int, onAppearanc
                             4 -> onPinWidget(GlassAnalogClockWidget::class.java, opacity, accentIndex)
                             5 -> onPinWidget(GlassScreenTimeWidget::class.java, opacity, accentIndex)
                             6 -> onPinWidget(GlassMusicWidget::class.java, opacity, accentIndex)
-                            else -> onPinWidget(GlassMusicMiniWidget::class.java, opacity, accentIndex)
+                            7 -> onPinWidget(GlassMusicMiniWidget::class.java, opacity, accentIndex)
+                            8 -> onPinWidget(GlassMonoClockWidget::class.java, opacity, accentIndex)
+                            else -> onPinWidget(GlassNeonClockWidget::class.java, opacity, accentIndex)
                         }
                     })
                 } else {
@@ -127,7 +129,9 @@ private fun GlassForgeApp(initialOpacity: Float, initialAccent: Int, onAppearanc
                             4 -> onPinWidget(GlassAnalogClockWidget::class.java, opacity, accentIndex)
                             5 -> onPinWidget(GlassScreenTimeWidget::class.java, opacity, accentIndex)
                             6 -> onPinWidget(GlassMusicWidget::class.java, opacity, accentIndex)
-                            else -> onPinWidget(GlassMusicMiniWidget::class.java, opacity, accentIndex)
+                            7 -> onPinWidget(GlassMusicMiniWidget::class.java, opacity, accentIndex)
+                            8 -> onPinWidget(GlassMonoClockWidget::class.java, opacity, accentIndex)
+                            else -> onPinWidget(GlassNeonClockWidget::class.java, opacity, accentIndex)
                         }
                         })
                         "Wallpapers" -> WallpaperGallery(accent)
@@ -236,6 +240,14 @@ private fun WidgetTile(design: WidgetDesign, modifier: Modifier, onOpen: () -> U
                     Icon(Icons.Default.AccessTime, null, tint = design.accent, modifier = Modifier.size(48.dp))
                     Text("ANALOG", color = Color.White, fontSize = 10.sp, letterSpacing = 2.sp)
                 }
+                8 -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("10:08", color = Color.White, fontSize = 32.sp, fontWeight = FontWeight.Light)
+                    Text("MONO · MINIMAL", color = design.accent, fontSize = 8.sp, letterSpacing = 1.sp)
+                }
+                9 -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("10:08", color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Bold)
+                    Text("VIOLET DIGITAL", color = design.accent, fontSize = 8.sp, letterSpacing = 1.sp)
+                }
                 5 -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("SCREEN ON", color = design.accent, fontSize = 9.sp)
                     Text("2h 38m", color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold)
@@ -279,6 +291,8 @@ private fun EditorScreen(design: WidgetDesign, opacity: Float, accentIndex: Int,
                     2 -> Column(horizontalAlignment = Alignment.CenterHorizontally) { Text("WEDNESDAY", color = accent, fontSize = 12.sp); Text("21", color = Color.White, fontSize = 64.sp, fontWeight = FontWeight.Light); Text("OCTOBER 2026", color = Muted, fontSize = 12.sp) }
                     3 -> Text("“Make today count.”", color = Color.White, fontSize = 22.sp, fontWeight = FontWeight.Medium)
                     4 -> Column(horizontalAlignment = Alignment.CenterHorizontally) { Icon(Icons.Default.AccessTime, null, tint = accent, modifier = Modifier.size(68.dp)); Text("ANALOG ATELIER", color = Color.White, fontSize = 10.sp, letterSpacing = 2.sp) }
+                    8 -> Column(horizontalAlignment = Alignment.CenterHorizontally) { Text("10:08", color = Color.White, fontSize = 48.sp, fontWeight = FontWeight.Light); Text("MONO · MINIMAL", color = accent, fontSize = 10.sp, letterSpacing = 2.sp) }
+                    9 -> Column(horizontalAlignment = Alignment.CenterHorizontally) { Text("10:08", color = Color.White, fontSize = 50.sp, fontWeight = FontWeight.Bold); Text("VIOLET DIGITAL", color = accent, fontSize = 10.sp, letterSpacing = 2.sp) }
                     5 -> Column(horizontalAlignment = Alignment.CenterHorizontally) { Text("SCREEN ON", color = accent, fontSize = 10.sp); Text("2h 38m", color = Color.White, fontSize = 34.sp, fontWeight = FontWeight.Bold); Text("SCREEN OFF · 6h 12m", color = Muted, fontSize = 10.sp) }
                     6, 7 -> Column(horizontalAlignment = Alignment.CenterHorizontally) { Icon(Icons.Default.GraphicEq, null, tint = accent, modifier = Modifier.size(42.dp)); Text("Now Playing", color = Color.White, fontSize = 20.sp, fontWeight = FontWeight.SemiBold); Text("‹    ▶    ›", color = accent, fontSize = 18.sp) }
                     else -> Unit
