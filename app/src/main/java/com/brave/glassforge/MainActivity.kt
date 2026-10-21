@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-private val Ink = Color(0xFF090A0F)
+private val Ink = Color(0xFF070709)
 private val Panel = Color(0xFF171920)
 private val PanelLight = Color(0xFF242731)
 private val Muted = Color(0xFF9A9DA8)
@@ -134,7 +134,7 @@ private fun WidgetLibrary(query: String, onQuery: (String) -> Unit, category: St
         Spacer(Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
-                Text("GLASSFORGE", color = accent, fontSize = 11.sp, letterSpacing = 3.sp, fontWeight = FontWeight.Bold)
+                Text("GLASS FORGE", color = Color.White, fontSize = 12.sp, letterSpacing = 4.sp, fontWeight = FontWeight.ExtraBold)
                 Text("Make it yours.", color = Color.White, fontSize = 29.sp, fontWeight = FontWeight.Bold)
                 Text("Glass widgets for your home screen", color = Muted, fontSize = 13.sp)
             }
@@ -142,6 +142,7 @@ private fun WidgetLibrary(query: String, onQuery: (String) -> Unit, category: St
                 Icon(Icons.Default.AutoAwesome, contentDescription = null, tint = Color.White, modifier = Modifier.size(24.dp))
             }
         }
+        GlassBentoStats(accent)
         FeaturedPreview(accent)
         OutlinedTextField(value = query, onValueChange = onQuery, modifier = Modifier.fillMaxWidth(), placeholder = { Text("Search widgets", color = Muted) }, leadingIcon = { Icon(Icons.Default.Search, null, tint = Muted) }, trailingIcon = { if (query.isNotEmpty()) IconButton(onClick = { onQuery("") }) { Icon(Icons.Default.Close, null) } }, singleLine = true, shape = RoundedCornerShape(18.dp), colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = accent, unfocusedBorderColor = Color(0xFF30333D), focusedContainerColor = Panel, unfocusedContainerColor = Panel, cursorColor = accent))
         Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -172,6 +173,20 @@ private fun WidgetLibrary(query: String, onQuery: (String) -> Unit, category: St
 }
 
 @Composable
+private fun GlassBentoStats(accent: Color) {
+    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(9.dp)) {
+        listOf(Triple("12", "NATIVE DESIGNS", Icons.Default.Widgets), Triple("5", "COLOR PRESETS", Icons.Default.Palette), Triple("10", "WIDGET PROVIDERS", Icons.Default.Tune)).forEach { stat ->
+            Column(Modifier.weight(1f).clip(RoundedCornerShape(18.dp)).background(Brush.linearGradient(listOf(Color(0xFF24242A), Color(0xFF101014)))).border(1.dp, Brush.linearGradient(listOf(Color.White.copy(alpha = .26f), accent.copy(alpha = .20f), Color.White.copy(alpha = .04f))), RoundedCornerShape(18.dp)).padding(11.dp)) {
+                Icon(stat.third, null, tint = accent, modifier = Modifier.size(16.dp))
+                Spacer(Modifier.height(8.dp))
+                Text(stat.first, color = accent, fontSize = 25.sp, fontWeight = FontWeight.ExtraBold, letterSpacing = (-1).sp)
+                Text(stat.second, color = Muted, fontSize = 7.sp, letterSpacing = .7.sp, lineHeight = 10.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+    }
+}
+
+@Composable
 private fun FeaturedPreview(accent: Color) {
     Box(Modifier.fillMaxWidth().height(175.dp).clip(RoundedCornerShape(26.dp)).background(Brush.linearGradient(listOf(Color(0xFF34234E), Color(0xFF171A25), Color(0xFF0E1016)))).border(1.dp, Color.White.copy(alpha = .15f), RoundedCornerShape(26.dp)).padding(18.dp)) {
         Column(Modifier.align(Alignment.CenterStart)) {
@@ -195,7 +210,10 @@ private fun FeaturedPreview(accent: Color) {
 @Composable
 private fun WidgetTile(design: WidgetDesign, modifier: Modifier, onOpen: () -> Unit, onAdd: () -> Unit) {
     Column(modifier.clip(RoundedCornerShape(22.dp)).background(Panel).border(1.dp, Color.White.copy(alpha = .08f), RoundedCornerShape(22.dp)).clickable(onClick = onOpen).padding(10.dp)) {
-        Box(Modifier.fillMaxWidth().height(128.dp).clip(RoundedCornerShape(16.dp)).background(Brush.linearGradient(listOf(design.accent.copy(alpha = .28f), Color(0xFF22242D), Color(0xFF111218)))).border(1.dp, Color.White.copy(alpha = .14f), RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
+        Box(Modifier.fillMaxWidth().height(128.dp).clip(RoundedCornerShape(16.dp)).background(Brush.linearGradient(listOf(Color(0xFF292930), Color(0xFF17171D), Color(0xFF0D0D11)))).border(1.dp, Brush.linearGradient(listOf(Color.White.copy(alpha = .30f), design.accent.copy(alpha = .22f), Color.White.copy(alpha = .04f))), RoundedCornerShape(16.dp)), contentAlignment = Alignment.Center) {
+            Column(Modifier.align(Alignment.TopStart).padding(start = 7.dp, top = 6.dp), verticalArrangement = Arrangement.spacedBy((-2).dp)) {
+                listOf(1f, .45f, .20f, .08f).forEach { echoAlpha -> Text(design.category.uppercase(), color = Color.White.copy(alpha = echoAlpha), fontSize = 6.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.ExtraBold, maxLines = 1) }
+            }
             when (design.provider) {
                 0 -> Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(if (design.style == 1) "10:08" else "10:08", color = Color.White, fontSize = if (design.style == 2) 36.sp else 30.sp, fontWeight = if (design.style == 1) FontWeight.Light else FontWeight.Bold)
