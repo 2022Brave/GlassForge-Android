@@ -21,12 +21,20 @@
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_quote_widget_info"/>
         </receiver>
+        <receiver android:name=".GlassMonoClockWidget" android:exported="true" android:label="Glass Mono Clock">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_clock_mono_widget_info"/>
+        </receiver>
+        <receiver android:name=".GlassNeonClockWidget" android:exported="true" android:label="Glass Neon Clock">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_clock_neon_widget_info"/>
+        </receiver>
         <receiver android:name=".GlassAnalogClockWidget" android:exported="true" android:label="Glass Analog Clock">
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_analog_clock_widget_info"/>
         </receiver>
         <receiver android:name=".GlassScreenTimeWidget" android:exported="true" android:label="Glass Screen Time">
-            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/><action android:name="com.brave.glassforge.SCREEN_TIME_REFRESH"/></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_screen_time_widget_info"/>
         </receiver>
         <receiver android:name=".GlassMusicWidget" android:exported="true" android:label="Glass Music">
