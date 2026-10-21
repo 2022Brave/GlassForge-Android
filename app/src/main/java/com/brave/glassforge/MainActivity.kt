@@ -62,12 +62,14 @@ class MainActivity : ComponentActivity() {
                     prefs.edit().putFloat("opacity", opacity).putInt("accent", accent).apply()
                     refreshAllWidgets()
                 },
-                onPinWidget = { provider -> pinWidget(provider) }
+                onPinWidget = { provider, opacity, accent -> pinWidget(provider, opacity, accent) }
             )
         }
     }
 
-    private fun pinWidget(providerClass: Class<out AppWidgetProvider>) {
+    private fun pinWidget(providerClass: Class<out AppWidgetProvider>, opacity: Float, accent: Int) {
+        // Save the appearance before Android creates the pinned widget so its first render uses the chosen style.
+        getSharedPreferences("glassforge", MODE_PRIVATE).edit().putFloat("opacity", opacity).putInt("accent", accent).apply()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && AppWidgetManager.getInstance(this).isRequestPinAppWidgetSupported) {
             val ok = AppWidgetManager.getInstance(this).requestPinAppWidget(ComponentName(this, providerClass), Bundle(), null)
             if (!ok) Toast.makeText(this, "Open your home screen → Widgets → GlassForge to add it.", Toast.LENGTH_LONG).show()
@@ -85,7 +87,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-private fun GlassForgeApp(initialOpacity: Float, initialAccent: Int, onAppearanceChanged: (Float, Int) -> Unit, onPinWidget: (Class<out AppWidgetProvider>) -> Unit) {
+private fun GlassForgeApp(initialOpacity: Float, initialAccent: Int, onAppearanceChanged: (Float, Int) -> Unit, onPinWidget: (Class<out AppWidgetProvider>, Float, Int) -> Unit) {
     var tab by remember { mutableStateOf("Widgets") }
     var query by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("All") }
@@ -100,20 +102,20 @@ private fun GlassForgeApp(initialOpacity: Float, initialAccent: Int, onAppearanc
                 if (selected != null) {
                     EditorScreen(selected!!, opacity, accentIndex, onBack = { selected = null }, onOpacity = { opacity = it; onAppearanceChanged(opacity, accentIndex) }, onAccent = { accentIndex = it; onAppearanceChanged(opacity, accentIndex) }, onAdd = { design ->
                         when (design.provider) {
-                            0 -> onPinWidget(GlassClockWidget::class.java)
-                            1 -> onPinWidget(GlassBatteryWidget::class.java)
-                            2 -> onPinWidget(GlassCalendarWidget::class.java)
-                            else -> onPinWidget(GlassQuoteWidget::class.java)
+                            0 -> onPinWidget(GlassClockWidget::class.java, opacity, accentIndex)
+                            1 -> onPinWidget(GlassBatteryWidget::class.java, opacity, accentIndex)
+                            2 -> onPinWidget(GlassCalendarWidget::class.java, opacity, accentIndex)
+                            else -> onPinWidget(GlassQuoteWidget::class.java, opacity, accentIndex)
                         }
                     })
                 } else {
                     when (tab) {
                         "Widgets" -> WidgetLibrary(query, { query = it }, category, { category = it }, accent, onSelect = { selected = it }, onAdd = { design ->
                             when (design.provider) {
-                                0 -> onPinWidget(GlassClockWidget::class.java)
-                                1 -> onPinWidget(GlassBatteryWidget::class.java)
-                                2 -> onPinWidget(GlassCalendarWidget::class.java)
-                                else -> onPinWidget(GlassQuoteWidget::class.java)
+                                0 -> onPinWidget(GlassClockWidget::class.java, opacity, accentIndex)
+                                1 -> onPinWidget(GlassBatteryWidget::class.java, opacity, accentIndex)
+                                2 -> onPinWidget(GlassCalendarWidget::class.java, opacity, accentIndex)
+                                else -> onPinWidget(GlassQuoteWidget::class.java, opacity, accentIndex)
                             }
                         })
                         "Wallpapers" -> WallpaperGallery(accent)
