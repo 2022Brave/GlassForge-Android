@@ -180,8 +180,7 @@ private fun FeaturedPreview(accent: Color) {
         Column(Modifier.align(Alignment.CenterStart)) {
             Text("THE GLASS COLLECTION", color = accent, fontSize = 10.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
-            Text("Your screen.
-Your atmosphere.", color = Color.White, fontSize = 24.sp, lineHeight = 27.sp, fontWeight = FontWeight.Bold)
+            Text("Your screen.\nYour atmosphere.", color = Color.White, fontSize = 24.sp, lineHeight = 27.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
             Text("Explore styles", color = Color.White.copy(alpha = .65f), fontSize = 12.sp)
         }
