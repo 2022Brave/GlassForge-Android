@@ -18,6 +18,14 @@ import java.util.Calendar
 import java.util.Locale
 
 class GlassScreenTimeWidget : AppWidgetProvider() {
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+        if (intent.action == ACTION_REFRESH) {
+            val manager = AppWidgetManager.getInstance(context)
+            onUpdate(context, manager, manager.getAppWidgetIds(android.content.ComponentName(context, GlassScreenTimeWidget::class.java)))
+        }
+    }
+
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         val granted = hasUsageAccess(context)
         val (onMs, offMs) = if (granted) calculateScreenTime(context) else 0L to 0L
@@ -29,11 +37,17 @@ class GlassScreenTimeWidget : AppWidgetProvider() {
             val settingsIntent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             val settingsPending = PendingIntent.getActivity(context, 801, settingsIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
             views.setOnClickPendingIntent(R.id.widget_root, settingsPending)
+            val refresh = Intent(context, GlassScreenTimeWidget::class.java).setAction(ACTION_REFRESH)
+            val refreshPending = PendingIntent.getBroadcast(context, 830, refresh, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+            views.setOnClickPendingIntent(R.id.screen_on_value, refreshPending)
+            views.setOnClickPendingIntent(R.id.screen_off_value, refreshPending)
             manager.updateAppWidget(id, views)
         }
     }
 
     companion object {
+        const val ACTION_REFRESH = "com.brave.glassforge.SCREEN_TIME_REFRESH"
+
         fun hasUsageAccess(context: Context): Boolean {
             val appOps = context.getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
             return appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, Process.myUid(), context.packageName) == AppOpsManager.MODE_ALLOWED
