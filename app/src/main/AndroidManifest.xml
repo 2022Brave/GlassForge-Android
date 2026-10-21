@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.PACKAGE_USAGE_STATS" />
     <application android:allowBackup="true" android:label="@string/app_name" android:theme="@style/Theme.GlassForge">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter>
@@ -20,5 +21,25 @@
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_quote_widget_info"/>
         </receiver>
+        <receiver android:name=".GlassAnalogClockWidget" android:exported="true" android:label="Glass Analog Clock">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_analog_clock_widget_info"/>
+        </receiver>
+        <receiver android:name=".GlassScreenTimeWidget" android:exported="true" android:label="Glass Screen Time">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_screen_time_widget_info"/>
+        </receiver>
+        <receiver android:name=".GlassMusicWidget" android:exported="true" android:label="Glass Music">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+                <action android:name="com.brave.glassforge.MUSIC_PLAY_PAUSE"/>
+                <action android:name="com.brave.glassforge.MUSIC_NEXT"/>
+                <action android:name="com.brave.glassforge.MUSIC_PREVIOUS"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_music_widget_info"/>
+        </receiver>
+        <service android:name=".GlassMediaNotificationListener" android:label="GlassForge media controls" android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" android:exported="true">
+            <intent-filter><action android:name="android.service.notification.NotificationListenerService"/></intent-filter>
+        </service>
     </application>
 </manifest>
