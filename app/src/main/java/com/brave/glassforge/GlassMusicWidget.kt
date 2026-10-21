@@ -47,7 +47,7 @@ class GlassMusicWidget : AppWidgetProvider() {
             val controller = activeController(context)
             ids.forEach { id ->
                 val views = RemoteViews(context.packageName, R.layout.widget_glass_music)
-                WidgetStyle.apply(context, views, R.id.widget_root, R.id.widget_accent)
+                WidgetStyle.apply(context, views, R.id.widget_root, R.id.widget_accent, id)
                 val metadata = controller?.metadata
                 views.setTextViewText(R.id.music_title, metadata?.getString(android.media.MediaMetadata.METADATA_KEY_TITLE) ?: "No active track")
                 views.setTextViewText(R.id.music_artist, metadata?.getString(android.media.MediaMetadata.METADATA_KEY_ARTIST) ?: "Open your music player")
