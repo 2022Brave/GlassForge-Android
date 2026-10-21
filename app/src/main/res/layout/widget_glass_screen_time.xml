@@ -3,7 +3,7 @@
     <ImageView android:id="@+id/widget_canvas" android:layout_width="match_parent" android:layout_height="match_parent" android:contentDescription="Glass widget surface" android:scaleType="fitXY" />
     <LinearLayout android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical" android:padding="16dp" android:gravity="center_vertical"
-    android:background="#00000000>
+    android:background="#00000000">
     <TextView android:id="@+id/widget_accent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="TODAY · DIGITAL BALANCE" android:textColor="#FF9C5CFF" android:textSize="10sp" android:letterSpacing="0.12"/>
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="12dp">
         <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
