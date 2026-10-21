@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="horizontal" android:gravity="center_vertical" android:padding="12dp"
+    android:background="#D9172030">
+    <AnalogClock android:layout_width="92dp" android:layout_height="92dp" android:dial="@android:drawable/clock_dial" android:hand_hour="@android:drawable/clock_hand_hour" android:hand_minute="@android:drawable/clock_hand_minute" />
+    <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingStart="12dp">
+        <TextView android:id="@+id/widget_accent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="ANALOG / GLASS" android:textColor="#FF9C5CFF" android:textSize="10sp" android:letterSpacing="0.1"/>
+        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Time, in its simplest form." android:textColor="#FFFFFFFF" android:textSize="13sp"/>
+    </LinearLayout>
+</LinearLayout>
