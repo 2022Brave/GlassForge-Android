@@ -26,7 +26,7 @@ import kotlin.math.min
  * Render at a 2x logical scale; ImageView scales the result to the launcher's cell.
  */
 object GlassCanvasRenderer {
-    enum class Kind { BATTERY, CLOCK, ANALOG_CLOCK, NEON_CLOCK, STACKED_CLOCK, CALENDAR, QUOTE, SEARCH_PILL, WEATHER, COMPASS, MUSIC, SCREEN_TIME }
+    enum class Kind { SURFACE, BATTERY, CLOCK, ANALOG_CLOCK, NEON_CLOCK, STACKED_CLOCK, CALENDAR, QUOTE, SEARCH_PILL, WEATHER, COMPASS, MUSIC, SCREEN_TIME }
 
     fun render(context: Context, kind: Kind, width: Int = 640, height: Int = 400, progress: Int = -1): Bitmap {
         val theme = GlassThemeManager.read(context)
@@ -41,6 +41,7 @@ object GlassCanvasRenderer {
         val card = RectF(4f, 4f, 636f, 396f)
         drawGlassSurface(canvas, card, radius, theme.backgroundColor, theme.glassAlpha, theme.transparentMode, accent)
         when (kind) {
+            Kind.SURFACE -> Unit
             Kind.BATTERY -> drawBattery(context, canvas, accent, progress)
             Kind.CLOCK -> drawClock(canvas, accent, false)
             Kind.ANALOG_CLOCK -> drawAnalogClock(canvas, accent)
