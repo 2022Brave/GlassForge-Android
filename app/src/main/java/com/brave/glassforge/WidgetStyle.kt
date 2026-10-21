@@ -47,7 +47,7 @@ object WidgetStyle {
         val appearance = appearanceFor(context, appWidgetId)
         val bg = Color.argb((appearance.opacity * 220).toInt(), 23, 32, 48)
         views.setInt(rootId, "setBackgroundColor", bg)
-        try { views.setTextColor(accentId, appearance.accentColor) } catch (_: Exception) { }
+        try { views.setTextColor(accentId, accents[appearance.accentIndex.coerceIn(0, accents.lastIndex)]) } catch (_: Exception) { }
     }
 
     private const val PREFS = "glassforge"
