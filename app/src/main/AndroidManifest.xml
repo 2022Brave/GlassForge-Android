@@ -41,5 +41,9 @@
         <service android:name=".GlassMediaNotificationListener" android:label="GlassForge media controls" android:permission="android.permission.BIND_NOTIFICATION_LISTENER_SERVICE" android:exported="true">
             <intent-filter><action android:name="android.service.notification.NotificationListenerService"/></intent-filter>
         </service>
+        <receiver android:name=".GlassMusicMiniWidget" android:exported="true" android:label="Glass Music Bar">
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_music_mini_widget_info"/>
+        </receiver>
     </application>
 </manifest>
