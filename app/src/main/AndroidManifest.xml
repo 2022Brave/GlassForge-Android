@@ -29,14 +29,6 @@
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_clock_neon_widget_info"/>
         </receiver>
-        <receiver android:name=".GlassMonoClockWidget" android:exported="true" android:label="Glass Mono Clock">
-            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_clock_mono_widget_info"/>
-        </receiver>
-        <receiver android:name=".GlassNeonClockWidget" android:exported="true" android:label="Glass Neon Clock">
-            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_clock_neon_widget_info"/>
-        </receiver>
         <receiver android:name=".GlassAnalogClockWidget" android:exported="true" android:label="Glass Analog Clock">
             <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_analog_clock_widget_info"/>
