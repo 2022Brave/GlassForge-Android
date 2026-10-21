@@ -60,6 +60,7 @@ class GlassMusicWidget : AppWidgetProvider() {
                 views.setOnClickPendingIntent(R.id.music_title, PendingIntent.getActivity(context, 814, settings, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE))
                 manager.updateAppWidget(id, views)
             }
+            GlassMusicMiniWidget.updateAll(context)
         }
 
         private fun actionPending(context: Context, action: String, request: Int) =
