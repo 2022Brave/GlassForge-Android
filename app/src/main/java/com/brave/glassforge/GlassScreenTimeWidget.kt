@@ -31,7 +31,7 @@ class GlassScreenTimeWidget : AppWidgetProvider() {
         val (onMs, offMs) = if (granted) calculateScreenTime(context) else 0L to 0L
         ids.forEach { id ->
             val views = RemoteViews(context.packageName, R.layout.widget_glass_screen_time)
-            WidgetStyle.apply(context, views, R.id.widget_root, R.id.widget_accent)
+            WidgetStyle.apply(context, views, R.id.widget_root, R.id.widget_accent, id)
             views.setTextViewText(R.id.screen_on_value, if (granted) format(onMs) else "Tap to enable")
             views.setTextViewText(R.id.screen_off_value, if (granted) format(offMs) else "Usage access")
             val settingsIntent = Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
