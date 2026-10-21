@@ -40,7 +40,12 @@ object GlassThemeManager {
 
     fun read(context: Context): Theme {
         val p = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
-        val legacy = intArrayOf(0xFF9C5CFF.toInt(), 0xFF38A8FF.toInt(), 0xFF17D7B0.toInt(), 0xFFFFB44A.toInt(), 0xFFFF5E8A.toInt(), 0xFFF0F0F4.toInt())\n        val accent = when {\n            p.contains("accentColor") -> p.getInt("accentColor", DEFAULT_ACCENT)\n            p.contains("accentArgb") -> p.getInt("accentArgb", DEFAULT_ACCENT)\n            else -> legacy[p.getInt("accent", 0).coerceIn(0, legacy.lastIndex)]\n        }
+        val legacy = intArrayOf(0xFF9C5CFF.toInt(), 0xFF38A8FF.toInt(), 0xFF17D7B0.toInt(), 0xFFFFB44A.toInt(), 0xFFFF5E8A.toInt(), 0xFFF0F0F4.toInt())
+        val accent = when {
+            p.contains("accentColor") -> p.getInt("accentColor", DEFAULT_ACCENT)
+            p.contains("accentArgb") -> p.getInt("accentArgb", DEFAULT_ACCENT)
+            else -> legacy[p.getInt("accent", 0).coerceIn(0, legacy.lastIndex)]
+        }
         val hsv = FloatArray(3)
         colorToHSV(accent, hsv)
         return Theme(
@@ -110,8 +115,8 @@ object GlassThemeManager {
         }
     }
 
-    fun withAlpha(color: Int, alpha: Float): Int =
-        Color.argb((alpha.coerceIn(0f, 1f) * 255).toInt(), Color.red(color), Color.green(color), Color.blue(color))
+    fun withAlpha(color: Int, alpha: Int): Int =
+        Color.argb(alpha.coerceIn(0, 255), Color.red(color), Color.green(color), Color.blue(color))
 
     private fun nearestLegacyAccent(color: Int): Int {
         val old = intArrayOf(0xFF9C5CFF.toInt(), 0xFF38A8FF.toInt(), 0xFF17D7B0.toInt(), 0xFFFFB44A.toInt(), 0xFFFF5E8A.toInt(), 0xFFF0F0F4.toInt())
