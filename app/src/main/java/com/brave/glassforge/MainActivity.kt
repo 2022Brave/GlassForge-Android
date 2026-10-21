@@ -105,34 +105,12 @@ private fun GlassForgeApp(initialOpacity: Float, initialAccent: Int, onAppearanc
             Column(Modifier.fillMaxSize()) {
                 if (selected != null) {
                     EditorScreen(selected!!, opacity, accentIndex, onBack = { selected = null }, onOpacity = { opacity = it; onAppearanceChanged(opacity, accentIndex) }, onAccent = { accentIndex = it; onAppearanceChanged(opacity, accentIndex) }, onAdd = { design ->
-                        when (design.provider) {
-                            0 -> onPinWidget(GlassClockWidget::class.java, opacity, accentIndex)
-                            1 -> onPinWidget(GlassBatteryWidget::class.java, opacity, accentIndex)
-                            2 -> onPinWidget(GlassCalendarWidget::class.java, opacity, accentIndex)
-                            3 -> onPinWidget(GlassQuoteWidget::class.java, opacity, accentIndex)
-                            4 -> onPinWidget(GlassAnalogClockWidget::class.java, opacity, accentIndex)
-                            5 -> onPinWidget(GlassScreenTimeWidget::class.java, opacity, accentIndex)
-                            6 -> onPinWidget(GlassMusicWidget::class.java, opacity, accentIndex)
-                            7 -> onPinWidget(GlassMusicMiniWidget::class.java, opacity, accentIndex)
-                            8 -> onPinWidget(GlassMonoClockWidget::class.java, opacity, accentIndex)
-                            else -> onPinWidget(GlassNeonClockWidget::class.java, opacity, accentIndex)
-                        }
+                        WidgetProviderRegistry.providerFor(design.provider)?.let { onPinWidget(it, opacity, accentIndex) }
                     })
                 } else {
                     when (tab) {
                         "Widgets" -> WidgetLibrary(query, { query = it }, category, { category = it }, accent, onSelect = { selected = it }, onAdd = { design ->
-                            when (design.provider) {
-                            0 -> onPinWidget(GlassClockWidget::class.java, opacity, accentIndex)
-                            1 -> onPinWidget(GlassBatteryWidget::class.java, opacity, accentIndex)
-                            2 -> onPinWidget(GlassCalendarWidget::class.java, opacity, accentIndex)
-                            3 -> onPinWidget(GlassQuoteWidget::class.java, opacity, accentIndex)
-                            4 -> onPinWidget(GlassAnalogClockWidget::class.java, opacity, accentIndex)
-                            5 -> onPinWidget(GlassScreenTimeWidget::class.java, opacity, accentIndex)
-                            6 -> onPinWidget(GlassMusicWidget::class.java, opacity, accentIndex)
-                            7 -> onPinWidget(GlassMusicMiniWidget::class.java, opacity, accentIndex)
-                            8 -> onPinWidget(GlassMonoClockWidget::class.java, opacity, accentIndex)
-                            else -> onPinWidget(GlassNeonClockWidget::class.java, opacity, accentIndex)
-                        }
+                            WidgetProviderRegistry.providerFor(design.provider)?.let { onPinWidget(it, opacity, accentIndex) }
                         })
                         "Wallpapers" -> WallpaperGallery(accent)
                         else -> SettingsScreen(opacity, accentIndex, onOpacity = { opacity = it; onAppearanceChanged(opacity, accentIndex) }, onAccent = { accentIndex = it; onAppearanceChanged(opacity, accentIndex) })
