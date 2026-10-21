@@ -9,7 +9,7 @@
         android:id="@+id/widget_canvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:contentDescription="@string/widget_visual"
+        android:contentDescription="Glass widget preview"
         android:scaleType="fitXY"
         android:adjustViewBounds="true" />
 </FrameLayout>
