@@ -20,7 +20,7 @@ class GlassMusicMiniWidget : AppWidgetProvider() {
             val controller = GlassMusicWidget.activeController(context)
             ids.forEach { id ->
                 val views = RemoteViews(context.packageName, R.layout.widget_glass_music_mini)
-                WidgetStyle.apply(context, views, R.id.widget_root, R.id.widget_accent)
+                WidgetStyle.apply(context, views, R.id.widget_root, R.id.widget_accent, id)
                 views.setTextViewText(R.id.music_mini_title, controller?.metadata?.getString(MediaMetadata.METADATA_KEY_TITLE) ?: "Nothing playing")
                 val playing = controller?.playbackState?.state == PlaybackState.STATE_PLAYING
                 views.setTextViewText(R.id.music_mini_play, if (playing) "Ⅱ" else "▶")
