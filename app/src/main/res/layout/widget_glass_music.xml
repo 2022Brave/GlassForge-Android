@@ -3,7 +3,7 @@
     <ImageView android:id="@+id/widget_canvas" android:layout_width="match_parent" android:layout_height="match_parent" android:contentDescription="Glass widget surface" android:scaleType="fitXY" />
     <LinearLayout android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
     android:orientation="vertical" android:padding="15dp" android:gravity="center_vertical"
-    android:background="#00000000>
+    android:background="#00000000">
     <TextView android:id="@+id/widget_accent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="NOW PLAYING" android:textColor="#FF9C5CFF" android:textSize="10sp" android:letterSpacing="0.15"/>
     <TextView android:id="@+id/music_title" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="6dp" android:text="No active track" android:textColor="#FFFFFFFF" android:textSize="18sp" android:fontFamily="sans-serif-medium" android:maxLines="1" android:ellipsize="end"/>
     <TextView android:id="@+id/music_artist" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Tap title to enable media access" android:textColor="#BFFFFFFF" android:textSize="12sp" android:maxLines="1" android:ellipsize="end"/>
