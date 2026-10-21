@@ -1,17 +1,24 @@
 package com.brave.glassforge
 
 import android.appwidget.AppWidgetManager
+import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BatteryFull
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.FormatQuote
 import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,70 +32,118 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 private val Ink = Color(0xFF080B12)
-private val Blue = Color(0xFF8AB4FF)
+private val AccentOptions = listOf(Color(0xFF8AB4FF), Color(0xFF9AE6D1), Color(0xFFC5A7FF), Color(0xFFFFC6A5))
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContent { StudioScreen { startActivity(Intent(AppWidgetManager.ACTION_APPWIDGET_PICK)) } }
+        val prefs = getSharedPreferences("glassforge", MODE_PRIVATE)
+        setContent {
+            StudioScreen(
+                initialOpacity = prefs.getFloat("opacity", .72f),
+                initialAccent = prefs.getInt("accent", 0),
+                onPinWidget = { provider -> pinWidget(provider) },
+                onAppearanceChanged = { opacity, accent ->
+                    prefs.edit().putFloat("opacity", opacity).putInt("accent", accent).apply()
+                    refreshAllWidgets()
+                }
+            )
+        }
+    }
+
+    private fun pinWidget(providerClass: Class<out AppWidgetProvider>) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+            Toast.makeText(this, "Widget pinning requires Android 8 or newer. Add it from your launcher's Widgets menu.", Toast.LENGTH_LONG).show()
+            return
+        }
+        val manager = AppWidgetManager.getInstance(this)
+        if (!manager.isRequestPinAppWidgetSupported) {
+            Toast.makeText(this, "Long-press your home screen, then choose Widgets → GlassForge.", Toast.LENGTH_LONG).show()
+            return
+        }
+        val requested = manager.requestPinAppWidget(ComponentName(this, providerClass), Bundle(), null)
+        if (!requested) Toast.makeText(this, "Could not open the widget pin prompt. Try your home screen's Widgets menu.", Toast.LENGTH_LONG).show()
+    }
+
+    private fun refreshAllWidgets() {
+        val manager = AppWidgetManager.getInstance(this)
+        listOf(GlassClockWidget::class.java, GlassBatteryWidget::class.java, GlassCalendarWidget::class.java, GlassQuoteWidget::class.java).forEach { klass ->
+            val component = ComponentName(this, klass)
+            val ids = manager.getAppWidgetIds(component)
+            if (ids.isNotEmpty()) sendBroadcast(Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).setComponent(component).putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, ids))
+        }
     }
 }
 
 @Composable
-private fun StudioScreen(openPicker: () -> Unit) {
-    var opacity by remember { mutableFloatStateOf(.72f) }
-    var accent by remember { mutableIntStateOf(0) }
-    val colors = listOf(Blue, Color(0xFF9AE6D1), Color(0xFFC5A7FF), Color(0xFFFFC6A5))
-    val glow = colors[accent]
+private fun StudioScreen(initialOpacity: Float, initialAccent: Int, onPinWidget: (Class<out AppWidgetProvider>) -> Unit, onAppearanceChanged: (Float, Int) -> Unit) {
+    var opacity by remember { mutableFloatStateOf(initialOpacity.coerceIn(.25f, 1f)) }
+    var accent by remember { mutableIntStateOf(initialAccent.coerceIn(0, AccentOptions.lastIndex)) }
+    val glow = AccentOptions[accent]
     MaterialTheme(colorScheme = darkColorScheme(primary = glow, background = Ink)) {
         Surface(Modifier.fillMaxSize(), color = Ink) {
-            Column(Modifier.padding(22.dp), verticalArrangement = Arrangement.spacedBy(18.dp)) {
+            Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 20.dp, vertical = 22.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text("GLASSFORGE", color = glow, fontSize = 12.sp, letterSpacing = 3.sp, fontWeight = FontWeight.Bold)
-                Text("Your widgets. Reframed.", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
-                Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).background(Brush.linearGradient(listOf(Color(0xFF344C70), Color(0xFF192335), Color(0xFF10151F)))).border(1.dp, Color.White.copy(alpha = .24f), RoundedCornerShape(28.dp)).padding(20.dp)) {
-                    Text("LIVE PREVIEW", color = glow, fontSize = 11.sp, letterSpacing = 2.sp)
+                Text("Widget Studio", color = Color.White, fontSize = 28.sp, fontWeight = FontWeight.SemiBold)
+                Text("Choose a design. Add it to your home screen.", color = Color.White.copy(alpha = .65f), fontSize = 13.sp)
+                PreviewCard(opacity, glow)
+                Text("WIDGET LIBRARY", color = glow, fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+                WidgetCard("Digital Glass Clock", "Live time and date • resizable", Icons.Default.Schedule, glow) { onPinWidget(GlassClockWidget::class.java) }
+                WidgetCard("Glass Battery", "Battery percentage and charging state", Icons.Default.BatteryFull, glow) { onPinWidget(GlassBatteryWidget::class.java) }
+                WidgetCard("Glass Calendar", "Today's date with a clean glass layout", Icons.Default.CalendarMonth, glow) { onPinWidget(GlassCalendarWidget::class.java) }
+                WidgetCard("Daily Quote", "A short motivational line on your home screen", Icons.Default.FormatQuote, glow) { onPinWidget(GlassQuoteWidget::class.java) }
+                Text("APPEARANCE", color = glow, fontSize = 11.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+                Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Color(0xB8232D40)).border(1.dp, Color.White.copy(alpha = .12f), RoundedCornerShape(22.dp)).padding(16.dp)) {
+                    Text("Glass opacity", color = Color.White, fontWeight = FontWeight.SemiBold)
+                    Slider(value = opacity, onValueChange = { opacity = it; onAppearanceChanged(opacity, accent) }, valueRange = .25f..1f)
+                    Text("${(opacity * 100).toInt()}% • applied to GlassForge widgets", color = glow, fontSize = 12.sp)
                     Spacer(Modifier.height(12.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Column(Modifier.weight(1f)) {
-                            Text("9:41", color = Color.White, fontSize = 42.sp, fontWeight = FontWeight.Light)
-                            Text("WEDNESDAY • 21 OCT", color = Color.White.copy(alpha = .72f), fontSize = 10.sp)
-                        }
-                        Box(Modifier.size(76.dp).clip(RoundedCornerShape(24.dp)).background(Color.White.copy(alpha = opacity * .22f)).border(1.dp, Color.White.copy(alpha = .4f), RoundedCornerShape(24.dp)), contentAlignment = Alignment.Center) {
-                            Icon(Icons.Default.BatteryFull, contentDescription = "Battery widget preview", tint = glow, modifier = Modifier.size(34.dp))
+                    Text("Accent color", color = Color.White, fontWeight = FontWeight.SemiBold)
+                    Spacer(Modifier.height(10.dp))
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        AccentOptions.forEachIndexed { index, color ->
+                            Surface(onClick = { accent = index; onAppearanceChanged(opacity, accent) }, color = color, shape = RoundedCornerShape(50),
+                                modifier = Modifier.size(38.dp).then(if (accent == index) Modifier.border(3.dp, Color.White, RoundedCornerShape(50)) else Modifier)) {}
                         }
                     }
-                    Spacer(Modifier.height(14.dp))
-                    Text("A calmer kind of glance.", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Medium)
-                    Text("Translucent surfaces • soft highlights • adaptive accents", color = Color.White.copy(alpha = .72f), fontSize = 12.sp)
                 }
-                Text("Widget studio", color = Color.White, fontSize = 21.sp, fontWeight = FontWeight.SemiBold)
-                WidgetRow("Glass Clock", "Time and date, minimal and legible.", true, glow)
-                WidgetRow("Glass Battery", "Battery level and charging state.", false, glow)
-                Button(onClick = openPicker, modifier = Modifier.fillMaxWidth()) { Text("Add a home-screen widget") }
-                Text("Glass appearance", color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-                Text("Preview opacity", color = Color.White.copy(alpha = .8f))
-                Slider(value = opacity, onValueChange = { opacity = it }, valueRange = .25f..1f)
-                Text("Accent color", color = Color.White.copy(alpha = .8f))
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    colors.forEachIndexed { i, c ->
-                        Surface(onClick = { accent = i }, color = c, shape = RoundedCornerShape(50), modifier = Modifier.size(34.dp).then(if (accent == i) Modifier.border(3.dp, Color.White, RoundedCornerShape(50)) else Modifier)) {}
-                    }
-                }
-                Spacer(Modifier.weight(1f, fill = false))
-                Text("Android widgets • glass-inspired, battery-conscious", color = Color.White.copy(alpha = .45f), fontSize = 11.sp)
+                Text("To add: tap Add widget, then approve the launcher prompt. If unavailable, long-press your home screen → Widgets → GlassForge.", color = Color.White.copy(alpha = .55f), fontSize = 12.sp)
             }
         }
     }
 }
 
 @Composable
-private fun WidgetRow(title: String, detail: String, clock: Boolean, accent: Color) {
-    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Color(0xB8232D40)).border(1.dp, Color.White.copy(alpha = .12f), RoundedCornerShape(20.dp)).padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
-        Icon(if (clock) Icons.Default.Schedule else Icons.Default.BatteryFull, contentDescription = null, tint = accent, modifier = Modifier.size(30.dp))
-        Spacer(Modifier.width(14.dp))
-        Column {
-            Text(title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 16.sp)
-            Text(detail, color = Color.White.copy(alpha = .65f), fontSize = 12.sp)
+private fun PreviewCard(opacity: Float, accent: Color) {
+    Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(28.dp)).background(Brush.linearGradient(listOf(Color(0xFF344C70), Color(0xFF192335), Color(0xFF10151F)))).border(1.dp, Color.White.copy(alpha = .24f), RoundedCornerShape(28.dp)).padding(20.dp)) {
+        Text("PREVIEW", color = accent, fontSize = 11.sp, letterSpacing = 2.sp)
+        Spacer(Modifier.height(10.dp))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Column(Modifier.weight(1f)) {
+                Text("10:30", color = Color.White, fontSize = 42.sp, fontWeight = FontWeight.Light)
+                Text("WEDNESDAY • 21 OCT", color = Color.White.copy(alpha = .72f), fontSize = 10.sp)
+            }
+            Box(Modifier.size(72.dp).clip(RoundedCornerShape(22.dp)).background(Color.White.copy(alpha = opacity * .22f)).border(1.dp, Color.White.copy(alpha = .45f), RoundedCornerShape(22.dp)), contentAlignment = Alignment.Center) {
+                Icon(Icons.Default.BatteryFull, contentDescription = null, tint = accent, modifier = Modifier.size(32.dp))
+            }
         }
+        Spacer(Modifier.height(10.dp))
+        Text("Glass that fits your setup.", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Medium)
+        Text("Opacity and accent changes are saved and applied to supported widgets.", color = Color.White.copy(alpha = .7f), fontSize = 12.sp)
+    }
+}
+
+@Composable
+private fun WidgetCard(title: String, subtitle: String, icon: androidx.compose.ui.graphics.vector.ImageVector, accent: Color, onAdd: () -> Unit) {
+    Row(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Color(0xB8232D40)).border(1.dp, Color.White.copy(alpha = .12f), RoundedCornerShape(20.dp)).padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(Modifier.size(48.dp).clip(RoundedCornerShape(15.dp)).background(Color.White.copy(alpha = .08f)).border(1.dp, Color.White.copy(alpha = .16f), RoundedCornerShape(15.dp)), contentAlignment = Alignment.Center) {
+            Icon(icon, contentDescription = null, tint = accent, modifier = Modifier.size(27.dp))
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(Modifier.weight(1f)) {
+            Text(title, color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+            Text(subtitle, color = Color.White.copy(alpha = .65f), fontSize = 11.sp)
+        }
+        Button(onClick = onAdd, contentPadding = PaddingValues(horizontal = 12.dp, vertical = 8.dp)) { Text("Add", fontSize = 12.sp) }
     }
 }
