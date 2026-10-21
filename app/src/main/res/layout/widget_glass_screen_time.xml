@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="16dp" android:gravity="center_vertical"
+    android:background="#D9172030">
+    <TextView android:id="@+id/widget_accent" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="TODAY · DIGITAL BALANCE" android:textColor="#FF9C5CFF" android:textSize="10sp" android:letterSpacing="0.12"/>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginTop="12dp">
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SCREEN ON" android:textColor="#AFFFFFFF" android:textSize="10sp"/>
+            <TextView android:id="@+id/screen_on_value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Enable access" android:textColor="#FFFFFFFF" android:textSize="21sp" android:fontFamily="sans-serif-medium"/>
+        </LinearLayout>
+        <View android:layout_width="1dp" android:layout_height="42dp" android:background="#55FFFFFF"/>
+        <LinearLayout android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:orientation="vertical" android:paddingStart="14dp">
+            <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="SCREEN OFF" android:textColor="#AFFFFFFF" android:textSize="10sp"/>
+            <TextView android:id="@+id/screen_off_value" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Tap to configure" android:textColor="#FFFFFFFF" android:textSize="21sp" android:fontFamily="sans-serif-medium"/>
+        </LinearLayout>
+    </LinearLayout>
+    <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="Tap widget to grant Usage Access · refreshes periodically" android:textColor="#AFFFFFFF" android:textSize="10sp"/>
+</LinearLayout>
