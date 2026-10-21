@@ -236,13 +236,16 @@ private fun WidgetTile(design: WidgetDesign, modifier: Modifier, onOpen: () -> U
 @Composable
 private fun EditorScreen(design: WidgetDesign, opacity: Float, accentIndex: Int, onBack: () -> Unit, onOpacity: (Float) -> Unit, onAccent: (Int) -> Unit, onAdd: (WidgetDesign) -> Unit) {
     val accent = Accents[accentIndex]
+    var previewSize by remember(design.name) { mutableStateOf("Wide") }
     Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             IconButton(onClick = onBack) { Icon(Icons.Default.ArrowBack, "Back", tint = Color.White) }
             Column(Modifier.weight(1f)) { Text("WIDGET STUDIO", color = accent, fontSize = 10.sp, letterSpacing = 2.sp); Text(design.name, color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold) }
         }
         Box(Modifier.fillMaxWidth().height(280.dp).clip(RoundedCornerShape(30.dp)).background(Brush.linearGradient(listOf(Color(0xFF242938), Color(0xFF111218)))).padding(20.dp), contentAlignment = Alignment.Center) {
-            Box(Modifier.fillMaxWidth(.8f).height(190.dp).clip(RoundedCornerShape(28.dp)).background(Color.White.copy(alpha = opacity * .17f)).border(1.dp, Color.White.copy(alpha = .28f), RoundedCornerShape(28.dp)).padding(18.dp), contentAlignment = Alignment.Center) {
+            val previewWidth = when (previewSize) { "Small" -> .52f; "Large" -> .96f; else -> .8f }
+            val previewHeight = when (previewSize) { "Small" -> 125.dp; "Large" -> 220.dp; else -> 175.dp }
+            Box(Modifier.fillMaxWidth(previewWidth).height(previewHeight).clip(RoundedCornerShape(28.dp)).background(Color.White.copy(alpha = opacity * .17f)).border(1.dp, Color.White.copy(alpha = .28f), RoundedCornerShape(28.dp)).padding(18.dp), contentAlignment = Alignment.Center) {
                 when (design.provider) {
                     0 -> Column(horizontalAlignment = Alignment.CenterHorizontally) { Text("10:08", color = Color.White, fontSize = 50.sp, fontWeight = FontWeight.Light); Text("WEDNESDAY · 21 OCT", color = accent, fontSize = 10.sp, letterSpacing = 1.sp) }
                     1 -> Column(horizontalAlignment = Alignment.CenterHorizontally) { Icon(Icons.Default.BatteryFull, null, tint = accent, modifier = Modifier.size(52.dp)); Text("76%", color = Color.White, fontSize = 36.sp, fontWeight = FontWeight.Bold); Text("BATTERY", color = Muted, fontSize = 10.sp) }
@@ -264,9 +267,9 @@ private fun EditorScreen(design: WidgetDesign, opacity: Float, accentIndex: Int,
             }
         }
         Text("SIZE", color = Color.White, fontWeight = FontWeight.Bold, fontSize = 13.sp, letterSpacing = 1.5.sp)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Small", "Wide", "Large").forEachIndexed { i, s -> Surface(color = if (i == 1) accent.copy(alpha = .2f) else Panel, shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f)) { Text(s, color = if (i == 1) accent else Muted, modifier = Modifier.padding(vertical = 13.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 13.sp) } } }
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { listOf("Small", "Wide", "Large").forEach { s -> Surface(color = if (previewSize == s) accent.copy(alpha = .2f) else Panel, shape = RoundedCornerShape(12.dp), modifier = Modifier.weight(1f).clickable { previewSize = s }) { Text(s, color = if (previewSize == s) accent else Muted, modifier = Modifier.padding(vertical = 13.dp), textAlign = androidx.compose.ui.text.style.TextAlign.Center, fontSize = 13.sp) } } }
         Button(onClick = { onAdd(design) }, modifier = Modifier.fillMaxWidth().height(54.dp), shape = RoundedCornerShape(17.dp)) { Icon(Icons.Default.AddToHomeScreen, null); Spacer(Modifier.width(8.dp)); Text("Add to home screen", fontWeight = FontWeight.Bold) }
-        Text("Preview settings are saved globally in this early build. Per-widget independent styles and size-specific layouts are on the implementation roadmap.", color = Muted, fontSize = 12.sp)
+        Text("Transparency and accent are applied to the real widget. Size here changes the preview only; after adding, resize the widget on your home screen using the launcher's resize handles. Widget styles are still shared globally in this build.", color = Muted, fontSize = 12.sp)
     }
 }
 
