@@ -20,10 +20,11 @@ class GlassBatteryWidget : AppWidgetProvider() {
             else -> "On battery"
         }
         ids.forEach { id ->
-            val v = RemoteViews(context.packageName, R.layout.widget_glass_battery)
-            v.setTextViewText(R.id.battery_percent, if (pct >= 0) "$pct%" else "Battery")
-            v.setTextViewText(R.id.battery_status, status)
-            manager.updateAppWidget(id, v)
+            val views = RemoteViews(context.packageName, R.layout.widget_glass_battery)
+            views.setTextViewText(R.id.battery_percent, if (pct >= 0) "$pct%" else "Battery")
+            views.setTextViewText(R.id.battery_status, status)
+            WidgetStyle.apply(context, views, R.id.widget_root, R.id.battery_percent)
+            manager.updateAppWidget(id, views)
         }
     }
 }
