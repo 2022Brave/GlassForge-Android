@@ -185,8 +185,8 @@ private fun WidgetLibrary(query: String, onQuery: (String) -> Unit, category: St
         Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(Panel).padding(16.dp)) {
             Text("MORE WIDGET FAMILIES", color = accent, fontSize = 11.sp, letterSpacing = 1.5.sp, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(6.dp))
-            Text("Weather · Music · Photos · Shortcuts · Screen time", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
-            Text("These are planned for later releases; only the listed working widget types can be added in this build.", color = Muted, fontSize = 12.sp)
+            Text("Next up: Weather · Photos · Shortcuts · Focus timer", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            Text("New clock faces, music players and screen-time tracking are now in the catalog. More families are planned.", color = Muted, fontSize = 12.sp)
         }
         Spacer(Modifier.height(8.dp))
     }
