@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector\nimport androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -336,24 +337,102 @@ private fun WallpaperGallery(accent: Color) {
 
 @Composable
 private fun SettingsScreen(opacity: Float, accentIndex: Int, onOpacity: (Float) -> Unit, onAccent: (Int) -> Unit) {
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+    val context = LocalContext.current
+    val initialTheme = remember { GlassThemeManager.read(context) }
+    var accentHue by remember { mutableFloatStateOf(initialTheme.hue) }
+    var backgroundHue by remember {
+        val hsv = FloatArray(3)
+        android.graphics.Color.colorToHSV(initialTheme.backgroundColor, hsv)
+        mutableFloatStateOf(hsv[0])
+    }
+    var backgroundBrightness by remember {
+        val hsv = FloatArray(3)
+        android.graphics.Color.colorToHSV(initialTheme.backgroundColor, hsv)
+        mutableFloatStateOf(hsv[2].coerceIn(.04f, .35f))
+    }
+    var transparent by remember { mutableStateOf(initialTheme.transparentMode) }
+    var saved by remember { mutableStateOf(false) }
+    val accentColor = Color(android.graphics.Color.HSVToColor(floatArrayOf(accentHue, .78f, 1f)))
+    val rainbow = listOf(Color.Red, Color(0xFFFF9800), Color.Yellow, Color(0xFF00D084), Color(0xFF1D9BF0), Color(0xFF6842FF), Color(0xFFFF3DAB))
+    fun updateTheme() {
+        val background = android.graphics.Color.HSVToColor(floatArrayOf(backgroundHue, .22f, backgroundBrightness))
+        GlassThemeManager.save(context, accentColor = android.graphics.Color.HSVToColor(floatArrayOf(accentHue, .78f, 1f)), backgroundColor = background, glassAlpha = opacity, transparentMode = transparent, hue = accentHue)
+        saved = false
+    }
+    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(horizontal = 18.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Spacer(Modifier.height(10.dp))
-        Text("PREFERENCES", color = Accents[accentIndex], fontSize = 11.sp, letterSpacing = 3.sp, fontWeight = FontWeight.Bold)
-        Text("Your studio.", color = Color.White, fontSize = 29.sp, fontWeight = FontWeight.Bold)
-        Text("Tune the look and feel of GlassForge.", color = Muted, fontSize = 13.sp)
-        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Panel).padding(16.dp)) {
-            Text("Default glass transparency", color = Color.White, fontWeight = FontWeight.SemiBold)
-            Text("${(opacity * 100).toInt()}%", color = Accents[accentIndex], fontSize = 13.sp)
-            Slider(value = opacity, onValueChange = onOpacity, valueRange = .25f..1f)
-            Spacer(Modifier.height(12.dp))
-            Text("Accent palette", color = Color.White, fontWeight = FontWeight.SemiBold)
-            Spacer(Modifier.height(12.dp))
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) { Accents.forEachIndexed { i, c -> Box(Modifier.size(36.dp).clip(CircleShape).background(c).then(if (i == accentIndex) Modifier.border(3.dp, Color.White, CircleShape) else Modifier).clickable { onAccent(i) }) } }
+        Text("GLASS FORGE  /  STUDIO", color = accentColor, fontSize = 11.sp, letterSpacing = 3.sp, fontWeight = FontWeight.Bold)
+        Text("Pick your colors.", color = Color.White, fontSize = 29.sp, fontWeight = FontWeight.Bold)
+        Text("A single visual language for your app and home-screen widgets.", color = Muted, fontSize = 13.sp)
+        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(24.dp)).background(Brush.linearGradient(listOf(Color(0xFF25252D), Color(0xFF111115)))).border(1.dp, Brush.linearGradient(listOf(Color.White.copy(alpha = .32f), accentColor.copy(alpha = .25f), Color.White.copy(alpha = .04f))), RoundedCornerShape(24.dp)).padding(18.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Text("PICK YOUR COLORS", color = Color.White, fontSize = 14.sp, letterSpacing = 2.sp, fontWeight = FontWeight.ExtraBold)
+            Text("ACCENT HUE  ·  ${accentHue.toInt()}°", color = Muted, fontSize = 10.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold)
+            Box(Modifier.fillMaxWidth().height(8.dp).clip(CircleShape).background(Brush.horizontalGradient(rainbow)))
+            Slider(value = accentHue, onValueChange = { accentHue = it; updateTheme() }, valueRange = 0f..360f, colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = accentColor, inactiveTrackColor = Color.White.copy(alpha = .18f)))
+            Text("BACKGROUND TINT  ·  ${backgroundHue.toInt()}°", color = Muted, fontSize = 10.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold)
+            Box(Modifier.fillMaxWidth().height(8.dp).clip(CircleShape).background(Brush.horizontalGradient(rainbow)))
+            Slider(value = backgroundHue, onValueChange = { backgroundHue = it; updateTheme() }, valueRange = 0f..360f, colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = accentColor, inactiveTrackColor = Color.White.copy(alpha = .18f)))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("SURFACE DARKNESS", color = Muted, fontSize = 10.sp, letterSpacing = 1.2.sp, modifier = Modifier.weight(1f), fontWeight = FontWeight.Bold)
+                Text("${(backgroundBrightness * 100).toInt()}%", color = Color.White, fontSize = 12.sp)
+            }
+            Slider(value = backgroundBrightness, onValueChange = { backgroundBrightness = it; updateTheme() }, valueRange = .04f.. .35f, colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = accentColor))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Glass Effect", color = Color.White, fontWeight = FontWeight.SemiBold)
+                    Text("${(opacity * 100).toInt()}% surface opacity", color = Muted, fontSize = 12.sp)
+                }
+            }
+            Slider(value = opacity, onValueChange = { onOpacity(it); updateTheme() }, valueRange = .20f..1f, colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = accentColor))
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Column(Modifier.weight(1f)) {
+                    Text("Transparent Color", color = Color.White, fontWeight = FontWeight.SemiBold)
+                    Text("Keep the rim and accent glow; remove the dark fill", color = Muted, fontSize = 11.sp)
+                }
+                Switch(checked = transparent, onCheckedChange = { transparent = it; updateTheme() }, colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = accentColor))
+            }
+            Text("QUICK PRESETS", color = Muted, fontSize = 10.sp, letterSpacing = 1.2.sp, fontWeight = FontWeight.Bold)
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                GlassThemeManager.presets.forEach { (name, colorInt) ->
+                    Box(Modifier.size(30.dp).clip(CircleShape).background(Color(colorInt)).border(1.dp, Color.White.copy(alpha = .65f), CircleShape).clickable {
+                        android.graphics.Color.colorToHSV(colorInt, FloatArray(3).also { accentHue = it[0] })
+                        updateTheme()
+                    })
+                }
+            }
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                OutlinedButton(onClick = {
+                    val reset = GlassThemeManager.reset(context)
+                    accentHue = reset.hue
+                    backgroundHue = 270f
+                    backgroundBrightness = .09f
+                    transparent = false
+                    onOpacity(reset.glassAlpha)
+                    onAccent(0)
+                    saved = true
+                }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)) {
+                    Icon(Icons.Default.Refresh, null); Spacer(Modifier.width(6.dp)); Text("Reset")
+                }
+                Button(onClick = { updateTheme(); saved = true }, modifier = Modifier.weight(1f), shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = accentColor, contentColor = Color.White)) {
+                    Icon(if (saved) Icons.Default.Check else Icons.Default.Lock, null); Spacer(Modifier.width(6.dp)); Text(if (saved) "Saved" else "Save")
+                }
+            }
         }
-        SettingsRow(Icons.Default.Widgets, "Widget library", "Browse available widget designs")
-        SettingsRow(Icons.Default.Palette, "Theme system", "Dark glass with accent colors")
-        SettingsRow(Icons.Default.Info, "About GlassForge", "Early access · version 0.2")
-        Text("GlassForge uses native Android home-screen widgets. Some advanced visual effects are limited by Android's widget system.", color = Muted, fontSize = 12.sp)
+        Column(Modifier.fillMaxWidth().clip(RoundedCornerShape(22.dp)).background(Panel).border(1.dp, Color.White.copy(alpha = .09f), RoundedCornerShape(22.dp)).padding(16.dp)) {
+            Text("LIVE STYLE", color = accentColor, fontSize = 10.sp, letterSpacing = 2.sp, fontWeight = FontWeight.Bold)
+            Spacer(Modifier.height(12.dp))
+            Box(Modifier.fillMaxWidth().height(120.dp).clip(RoundedCornerShape(22.dp)).background(if (transparent) Color.Transparent else Brush.linearGradient(listOf(Color(backgroundBrightness.let { android.graphics.Color.HSVToColor(floatArrayOf(backgroundHue, .22f, it)) }), Color(0xFF101014)))).border(1.dp, Brush.linearGradient(listOf(Color.White.copy(alpha = .32f), accentColor.copy(alpha = .25f), Color.White.copy(alpha = .04f))), RoundedCornerShape(22.dp)), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("02:38", color = accentColor, fontSize = 34.sp, fontWeight = FontWeight.Bold, letterSpacing = 2.sp)
+                    Text("DARK FROSTED GLASS", color = Color.White.copy(alpha = .72f), fontSize = 9.sp, letterSpacing = 2.sp)
+                }
+            }
+        }
+        SettingsRow(Icons.Default.Widgets, "Widget library", "Browse implemented native widget designs")
+        SettingsRow(Icons.Default.Palette, "Theme engine", "Shared persistent styling and instant widget refresh")
+        SettingsRow(Icons.Default.Info, "About GlassForge", "Native Android widgets · dark glass studio")
+        Text("Wallpaper blur is approximated with translucent gradients because Android launchers don't expose live wallpaper blur to RemoteViews.", color = Muted, fontSize = 12.sp)
+        Spacer(Modifier.height(8.dp))
     }
 }
 
