@@ -15,9 +15,7 @@ object WidgetStyle {
         0xFFF0F0F4.toInt()
     )
 
-    data class Appearance(val opacity: Float, val accentIndex: Int) {
-        val accentColor: Int get() = accents[accentIndex.coerceIn(0, accents.lastIndex)]
-    }
+    data class Appearance(val opacity: Float, val accentIndex: Int)
 
     fun appearanceFor(context: Context, appWidgetId: Int? = null): Appearance {
         val prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
