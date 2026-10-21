@@ -9,7 +9,7 @@
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_clock_widget_info"/>
         </receiver>
         <receiver android:name=".GlassBatteryWidget" android:exported="true" android:label="Glass Battery">
-            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/></intent-filter>
+            <intent-filter><action android:name="android.appwidget.action.APPWIDGET_UPDATE"/><action android:name="android.intent.action.ACTION_POWER_CONNECTED"/><action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/></intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/glass_battery_widget_info"/>
         </receiver>
         <receiver android:name=".GlassCalendarWidget" android:exported="true" android:label="Glass Calendar">
